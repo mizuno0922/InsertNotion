@@ -7,7 +7,7 @@ const notion = new Client({
 
 const databaseId = "91600c147f3d4ab4b76e1e513ca17896"; // ここにデータベースIDを入力
 
-async function createPageWithData(metadata) {
+async function createPageWithData(metadata, raw_data) {
   try {
     const response = await notion.pages.create({
       parent: { database_id: databaseId },
@@ -29,6 +29,18 @@ async function createPageWithData(metadata) {
         Descripton: {
           select: { name: metadata.descripton[0]}, // カテゴリーの最初の要素を使用
         },
+        File: { // FileプロパティにURL経由でファイルを追加
+          files: [
+            {
+              name: metadata.title + ".3dm",
+              type: "external",
+              external: {
+                url: raw_data[0],
+              },
+            },
+          ],
+        },
+        
       },
       // Photosの埋め込みにはblocksを使用
       children: metadata.photos.map((photoUrl) => ({
@@ -50,6 +62,7 @@ async function createPageWithData(metadata) {
 // JSONデータからmetadataを抽出
 const jsonData = {
   // JSONデータをここに配置...
+  raw_data:["https://drive.google.com/uc?id=1v06f8bKy5MZMgPhwZAoQHBqV7MZJM9lx&export=download"] ,
   metadata: {
     title: 'テスト挿入',
     category: [['家具'], ['Biesse']],
@@ -60,4 +73,4 @@ const jsonData = {
   // 省略...
 };
 
-createPageWithData(jsonData.metadata);
+createPageWithData(jsonData.metadata, jsonData.raw_data);
